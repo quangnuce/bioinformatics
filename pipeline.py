@@ -35,7 +35,7 @@ def geneClustering(prokka_folder,gff_folder,roary_folder):
               shutil.copy(os.path.abspath(str(root) + '/' + _file), gff_folder+'/'+newname)
     myCmd = 'roary -f '+ROARY_OUTPUT+' -e -n -v '+gff_folder+'/*.gff'
     os.system(myCmd)
-def annotateAMRgenes(PROKKA_OUTPUT,RGI_OUTPUT,RGI_PATH):
+def annotateAMRgenes(PROKKA_OUTPUT,RGI_OUTPUT):
     #annotate AMR genes base on protein-annotation files of prokka
     for root, dirs, files in os.walk(PROKKA_OUTPUT):
         for _file in files:
@@ -64,6 +64,7 @@ def countingKmer(fasta_folder,kmc_output):
 def main():
     annotateProtein(FASTA_IN,PROKKA_OUTPUT)
     geneClustering(PROKKA_OUTPUT,GFF_OUTPUT,ROARY_OUTPUT)
-    annotateAMRgenes(PROKKA_OUTPUT,RGI_OUTPUT,RGI_PATH)
+    annotateAMRgenes(PROKKA_OUTPUT,RGI_OUTPUT)
+    countingKmer(FASTA_IN,KMC_OUTPUT)
 if __name__== "__main__" :
     main()
