@@ -14,8 +14,9 @@ Make a folder contains all DNA sequences in fasta format (.fasta, .fna)
 Parameter:
 - Fasta folder: contains all fasta files
 - Output folder: stores all file exported from running pipeline
+- CARD data: path to card.json (RGI). Get from here: https://card.mcmaster.ca/latest/data
 ```bash
-python pipeline.py Example Example/Out
+python pipeline.py Example Example/Out card.json
 ```
 ### Export data for ML
 Parameter:
