@@ -1,7 +1,7 @@
 # Pipeline for gene annotation, clustering and extract data for ML
 
 ## Prerequisites
-- Python 3.7
+- Python 3.6
 - Prokka
 - RGI
 - Roary
