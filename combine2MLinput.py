@@ -5,12 +5,12 @@ import json
 from sys import argv,stderr
 #python combine2MLinput.py [roary_out] [RGI_PATH] [K-mer dump folder] [ArrIndr] [ML_INPUT]
 
-roary_out=argv[1]
-rgi_out=argv[2]
-kmerdump=argv[3]
+ROARY_OUT=argv[1]
+RGI_OUT=argv[2]
+KMER_DUMP=argv[3]
 arrIndr=argv[4]
-mlinputpath=argv[5]
-def generatePangenomeInput(roary_out,rgi_out):
+ML_INPUT=argv[5]
+def generatePangenomeInput(roary_out,rgi_out,mlinput):
     #open file gene_presence_absence.csv, make input files for all genes and accessory genes
     strain=[]
     data = pd.read_csv(roary_out+'/gene_presence_absence.csv', sep=',',na_filter=False, error_bad_lines=False, index_col=False, dtype='unicode')
@@ -56,11 +56,12 @@ def generatePangenomeInput(roary_out,rgi_out):
         newc= pd.DataFrame({gene:genes})
         export_amr_tb=export_amr_tb.join(newc)
     print('export_amr_tb:',export_amr_tb)
-    #generate export files for whole genome and accessory gene
+    #generate export files for whole genes and accessory gene
+    print('process pangenome')
     for index, row in data.iterrows():
         if(index>0):
             genes=[]
-            print('process at ',index)
+            #print('process at ',index)
             for s in strain:
                 #print(s,":",row[s])
                 if(row[s]==''):
@@ -85,15 +86,15 @@ def generatePangenomeInput(roary_out,rgi_out):
     print('export_accessory_tb:',export_accessory_tb)
     print('export_amr_accessory_tb:',export_amr_accessory_tb)
 
-    export_fullgenes_tb.to_csv(mlinputpath+'/AllGenes.csv')
-    export_accessory_tb.to_csv(mlinputpath+'/AccessoryGenes.csv')
-    export_amr_tb.to_csv(mlinputpath+'/AMRGenes.csv')
+    export_fullgenes_tb.to_csv(mlinput+'/AllGenes.csv')
+    export_accessory_tb.to_csv(mlinput+'/AccessoryGenes.csv')
+    export_amr_tb.to_csv(mlinput+'/AMRGenes.csv')
 
-def generateKmerInput(kmerdump,ArrIndr,ML_INPUT):
+def generateKmerInput(kmerdump,ArrIndr,ml_input):
     #generate all kmer
-    # open up the contigs file
-    if not os.path.exists(ML_INPUT+"/kmer"):
-        os.makedirs(ML_INPUT+"/kmer")
+    print("Generate k-mer files")
+    if not os.path.exists(ml_input+"/kmer"):
+        os.makedirs(ml_input+"/kmer")
     f = open(ArrIndr)
     # init feature hash
     featureHash = {}
@@ -109,12 +110,12 @@ def generateKmerInput(kmerdump,ArrIndr,ML_INPUT):
     for root, dirs, files in os.walk(kmerdump):
         for _file in files:
             if _file.endswith('.kmrs'):
-                generateSample(str(root)+'/'+_file,featureHash,ML_INPUT)
+                generateSample(str(root)+'/'+_file,featureHash,ml_input)
 
     # create array to hold contigs
 
-def generateSample(kmcfile,featureHash,ML_INPUT):
-    print("Call function generateSample")
+def generateSample(kmcfile,featureHash,ml_input):
+    #print("Call function generateSample")
     f = open(kmcfile)
 
     # init kmc contigs hash
@@ -135,6 +136,9 @@ def generateSample(kmcfile,featureHash,ML_INPUT):
     frameKmer= pd.DataFrame({"kmer":kmer})
     frameCount=pd.DataFrame({"count":count})
     frameKmer=frameKmer.join(frameCount)
-    frameKmer.to_csv(ML_INPUT+'/kmer/'+os.path.splitext(os.path.basename(kmcfile))[0]+'.kmer.csv')
-
-generateKmerInput(kmerdump,arrIndr,mlinputpath)
+    frameKmer.to_csv(ml_input+'/kmer/'+os.path.splitext(os.path.basename(kmcfile))[0]+'.kmer.csv')
+def main():
+    generatePangenomeInput(ROARY_OUT,RGI_OUT,ML_INPUT)
+    generateKmerInput(KMER_DUMP,arrIndr,ML_INPUT)
+if __name__== "__main__" :
+    main()
