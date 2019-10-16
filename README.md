@@ -7,7 +7,7 @@
 - Roary
 - KMC
 ## Pipeline
-
+![Diagram](https://github.com/quangnuce/bioinformatics/pipeline.png)
 ## Usage
 Make a folder contains all DNA sequences in fasta format (.fasta, .fna)
 ### Run gene annotation and clustering 
