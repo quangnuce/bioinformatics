@@ -14,7 +14,7 @@ Parameter:
 - Fasta folder: contains all fasta files
 - Output folder: stores all file exported from running pipeline
 ```bash
-python pipeline.py Exmaple Example/Out
+python pipeline.py Example Example/Out
 ```
 ### Export data for ML
 Parameter:
