@@ -6,6 +6,7 @@
 - RGI
 - Roary
 - KMC
+## Pipeline
 
 ## Usage
 Make a folder contains all DNA sequences in fasta format (.fasta, .fna)
