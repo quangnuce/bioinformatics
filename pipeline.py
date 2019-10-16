@@ -1,7 +1,7 @@
 import os, shutil, glob
 from sys import argv,stderr
 
-#python pipeline.py [fna_folder] [output_folder]
+#python pipeline.py [fna_folder] [output_folder] [card_json]
 
 FASTA_IN=argv[1]
 output=argv[2]
@@ -10,6 +10,7 @@ GFF_OUTPUT=output+'/PROKKA_GFF'
 ROARY_OUTPUT=output+'/ROARY_OUT'
 RGI_OUTPUT=output+'/RGI_OUTPUT'
 KMC_OUTPUT=output+'/KMC_OUTPUT'
+CARD_JSON=argv[3]
 #RGI_PATH=argv[3]
 def annotateProtein(fasta_folder,prokka_folder):
     #annotate each fasta file with prokka, the output is stored in the folder with the folder name is fasta filename
@@ -35,13 +36,16 @@ def geneClustering(prokka_folder,gff_folder,roary_folder):
               shutil.copy(os.path.abspath(str(root) + '/' + _file), gff_folder+'/'+newname)
     myCmd = 'roary -f '+ROARY_OUTPUT+' -e -n -v '+gff_folder+'/*.gff'
     os.system(myCmd)
-def annotateAMRgenes(PROKKA_OUTPUT,RGI_OUTPUT):
+def annotateAMRgenes(prokka_output,rgi_output,card_json):
     #annotate AMR genes base on protein-annotation files of prokka
-    for root, dirs, files in os.walk(PROKKA_OUTPUT):
+    if not os.path.exists(rgi_output):
+        os.makedirs(rgi_output)
+    os.system('rgi load --card_json '+card_json+' --local')
+    for root, dirs, files in os.walk(prokka_output):
         for _file in files:
             if _file.endswith('.faa'):
               newname =os.path.basename(str(root))
-              myCmd = 'rgi main --input_sequence '+PROKKA_OUTPUT+'/'+newname+'.fna/'+_file+' --output_file '+RGI_OUTPUT+'/'+newname+' --input_type protein --local --clean'
+              myCmd = 'rgi main --input_sequence '+prokka_output+'/'+newname+'/'+_file+' --output_file '+rgi_output+'/'+newname+' --input_type protein --local --clean'
               print ('cmd: ' , myCmd)
               os.system(myCmd)
 def countingKmer(fasta_folder,kmc_output):
@@ -62,9 +66,9 @@ def countingKmer(fasta_folder,kmc_output):
                 os.remove(kmc_output+'/'+newname+'.kmc_pre')
 
 def main():
-    annotateProtein(FASTA_IN,PROKKA_OUTPUT)
-    geneClustering(PROKKA_OUTPUT,GFF_OUTPUT,ROARY_OUTPUT)
-    annotateAMRgenes(PROKKA_OUTPUT,RGI_OUTPUT)
-    countingKmer(FASTA_IN,KMC_OUTPUT)
+    #annotateProtein(FASTA_IN,PROKKA_OUTPUT)
+    #geneClustering(PROKKA_OUTPUT,GFF_OUTPUT,ROARY_OUTPUT)
+    annotateAMRgenes(PROKKA_OUTPUT,RGI_OUTPUT,CARD_JSON)
+    #countingKmer(FASTA_IN,KMC_OUTPUT)
 if __name__== "__main__" :
     main()
