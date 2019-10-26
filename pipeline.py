@@ -5,12 +5,13 @@ from sys import argv,stderr
 
 FASTA_IN=argv[1]
 output=argv[2]
+CARD_JSON=argv[3]
 PROKKA_OUTPUT=output+'/PROKKA_OUT'
 GFF_OUTPUT=output+'/PROKKA_GFF'
 ROARY_OUTPUT=output+'/ROARY_OUT'
-RGI_OUTPUT=output+'/RGI_OUTPUT'
+RGI_OUTPUT=output+'/RGI_OUT'
 KMC_OUTPUT=output+'/KMC_OUTPUT'
-CARD_JSON=argv[3]
+
 #RGI_PATH=argv[3]
 def annotateProtein(fasta_folder,prokka_folder):
     #annotate each fasta file with prokka, the output is stored in the folder with the folder name is fasta filename
@@ -48,27 +49,9 @@ def annotateAMRgenes(prokka_output,rgi_output,card_json):
               myCmd = 'rgi main --input_sequence '+prokka_output+'/'+newname+'/'+_file+' --output_file '+rgi_output+'/'+newname+' --input_type protein --local --clean'
               print ('cmd: ' , myCmd)
               os.system(myCmd)
-def countingKmer(fasta_folder,kmc_output):
-    #generate kmer counting files from fasta files using kmc_dump
-    if not os.path.exists(kmc_output):
-        os.makedirs(kmc_output)
-    for root, dirs, files in os.walk(fasta_folder):
-        for _file in files:
-            if _file.endswith(('.fna','.fasta','.fn')):
-                #print ('Found file in: ' , str(root),_file)
-                newname = os.path.splitext(os.path.basename(_file))[0]
-                #print ('Basename ' , newname);
-                cmd='kmc -k10 -ci1 -fa -fm '+fasta_folder+'/'+_file+ ' '+kmc_output+'/'+newname+' '+ kmc_output+'/'+newname+'_tmp'
-                os.system(cmd)
-                cmd_dump='kmc_dump '+kmc_output+'/'+newname+' '+kmc_output+'/'+newname+'.10.kmrs'
-                os.system(cmd_dump)
-                os.remove(kmc_output+'/'+newname+'.kmc_suf')
-                os.remove(kmc_output+'/'+newname+'.kmc_pre')
-
 def main():
-    #annotateProtein(FASTA_IN,PROKKA_OUTPUT)
-    #geneClustering(PROKKA_OUTPUT,GFF_OUTPUT,ROARY_OUTPUT)
+    annotateProtein(FASTA_IN,PROKKA_OUTPUT)
+    geneClustering(PROKKA_OUTPUT,GFF_OUTPUT,ROARY_OUTPUT)
     annotateAMRgenes(PROKKA_OUTPUT,RGI_OUTPUT,CARD_JSON)
-    #countingKmer(FASTA_IN,KMC_OUTPUT)
 if __name__== "__main__" :
     main()
