@@ -35,7 +35,7 @@ python combine2MLInput_GeneCluster.py Example/OUT/PROKKA_OUT Example/OUT/ROARY_O
 Parameter:
 - Fasta folder: contains all fasta files
 - ML output folder
-- k
+- k (10-20)
 - Prokka output folder
 - RGI output folder
 ```bash
